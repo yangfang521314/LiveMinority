@@ -16,6 +16,8 @@ class LiveApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         mInstance = this
+//        DeviceInfoTools.getInstance().init(this)
+
     }
 
 }

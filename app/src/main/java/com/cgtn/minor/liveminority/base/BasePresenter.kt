@@ -1,20 +1,36 @@
 package com.cgtn.minor.liveminority.base
 
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+
 /**
  * created by yf on 2019/1/4.
  */
-abstract class BasePresenter<T : BaseContract.View> : BaseContract.Presenter<T> {
+abstract class BasePresenter<T : BaseContract.BaseView> : BaseContract.Presenter<T> {
+
+
     protected var mView: T? = null
+    private var mCompositeDisposable: CompositeDisposable? = null
 
-    override fun subscribe() {
+
+    fun subscribe(disposable: Disposable) {
+        if (mCompositeDisposable == null) {
+            mCompositeDisposable = CompositeDisposable()
+        }
+        mCompositeDisposable!!.add(disposable)
     }
 
-    override fun unsubscribe() {
+    override fun attach(view: BaseContract.BaseView) {
+        mView = view as T
+
     }
 
-    override fun attach(view: T) {
-        mView = view
+    fun unsubscribe() {
+        if (mCompositeDisposable != null) {
+            mCompositeDisposable!!.clear()
+        }
     }
+
 
     override fun detach() {
         if (mView != null) {

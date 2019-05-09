@@ -5,6 +5,7 @@ import com.cgtn.minor.liveminority.BuildConfig
 import com.google.gson.GsonBuilder
 import com.ksyun.media.streamer.capture.CameraCapture
 import com.ksyun.media.streamer.kit.StreamerConstants
+import com.ksyun.media.streamer.kit.StreamerConstants.ENCODE_METHOD_SOFTWARE_COMPAT
 
 /**
  * created by yf on 2019/1/7.
@@ -24,28 +25,12 @@ class BaseStreamConfig {
     //方向
     var mOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     //编码方式
-    var mEncodeMethod: Int = StreamerConstants.ENCODE_METHOD_SOFTWARE
+    var mEncodeMethod: Int = ENCODE_METHOD_SOFTWARE_COMPAT
 
     var mAutoStart: Boolean = false
 
     //debug设置显示推流视频的信息
     var mShowDebugInfo: Boolean = BuildConfig.DEBUG
-
-    //设置摄像头采集分辨率
-
-    //视频采集率
-    var mCaptureResolution: Int = 0
-    //预览分辨率
-    var mPreviewResolution: Int = StreamerConstants.VIDEO_RESOLUTION_720P
-    var mPreviewViewType: Int = 0
-    var mBgSwitchMode: Int = 0
-    var mVideoCodecId: Int = 0
-    var mVideoEncodeScene: Int = 0
-    var mVideoEncodeProfile: Int = 0
-    var mAudioEncodeProfile: Int = 0
-    var mZoomFocus: Boolean = false
-    var mStereoStream: Boolean = false
-    var mBluetoothMicFirst: Boolean = false
 
     fun fromJson(json: String?): BaseStreamConfig {
         return GsonBuilder().create().fromJson(json, this.javaClass)

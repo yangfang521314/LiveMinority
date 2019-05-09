@@ -5,12 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.cgtn.minor.liveminority.R
-import com.cgtn.minor.liveminority.db.DBHelper
-import com.cgtn.minor.liveminority.mvp.model.TaskEntity
 import com.example.yangfang.kotlindemo.util.SharedPreferenceUtil
-import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class SplashActivity : AppCompatActivity() {
@@ -32,7 +28,7 @@ class SplashActivity : AppCompatActivity() {
         if (isLogin) {
             Observable.timer(3L, TimeUnit.SECONDS)
                 .subscribe {
-                    startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                    startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
                     finish()
                 }
 

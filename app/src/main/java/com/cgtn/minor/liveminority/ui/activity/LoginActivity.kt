@@ -2,79 +2,118 @@ package com.cgtn.minor.liveminority.ui.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.DashPathEffect
+import android.graphics.Typeface
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.text.TextUtils
-import android.view.KeyEvent
+import com.cgtn.minor.liveminority.R
 import com.cgtn.minor.liveminority.base.BaseMVPActivity
-import com.cgtn.minor.liveminority.db.DBHelper
 import com.cgtn.minor.liveminority.mvp.contract.LoginContract
-import com.cgtn.minor.liveminority.mvp.model.TaskEntity
 import com.cgtn.minor.liveminority.mvp.presenter.LoginPresenter
+import com.cgtn.minor.liveminority.utils.LogUtil
 import com.cgtn.minor.liveminority.utils.toast
+import com.cgtn.minor.liveminority.widget.CustomHint
 import com.example.yangfang.kotlindemo.util.SharedPreferenceUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
-import io.reactivex.Completable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_login.*
 
 
 class LoginActivity : BaseMVPActivity<LoginContract.LoginView, LoginPresenter>(), LoginContract.LoginView {
-    private var isLogin by SharedPreferenceUtil("login", false)
+    //储存用户是否登录
+    private var _login by SharedPreferenceUtil("login", false)
+    //存储用户token
+    private var _token by SharedPreferenceUtil("token", "")
 
-    private var mExitTime = 0L
-    private var circleAngle: Int = 0
+    //存储用户name
+    private var _username by SharedPreferenceUtil("user", "")
 
+    private var mUserName: String? = null
 
-    override fun loginSuccess() {
+    private var mPwd: String? = null
+
+    companion object {
+        private const val PERMISSION_REQUEST: Int = 101
 
     }
 
-    private var mUserName: String? = null
-    private var mPwd: String? = null
     override fun initData() {
         requestPermission()
         mPresenter = LoginPresenter()
         mPresenter!!.attach(this)
-        //添加进入数据库
 
     }
-
-
-    private lateinit var effect: DashPathEffect
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun initView() {
-        mUserName = login_username.text.toString()
-        mPwd = login_pwd.text.toString()
         login.setOnClickListener {
-            isLogin = true
-            Completable.complete()
-                .observeOn(Schedulers.io())
-                .subscribe {
-                    DBHelper.mInstance.getTaskDao()
-                        .addTaskData(TaskEntity(1, "rtmp://54.223.252.143:1935/tv/Android1"))
-                }
-            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-            finish()
-//            if (checkUtils()) {
-//                mPresenter!!.login()
-//            }
-        }
-    }
+            mUserName = login_username.text.toString()
+            mPwd = login_pwd.text.toString()
+            if (checkUtils()) {
+                _username = mUserName!!
+                mPresenter!!.login(mUserName!!, mPwd!!)
+            }
 
+        }
+        val userNameHint = CustomHint(Typeface.DEFAULT, "User name", Typeface.ITALIC)
+        login_username.hint = userNameHint
+        val pwdHint = CustomHint(Typeface.DEFAULT, "Password", Typeface.ITALIC)
+        login_pwd.hint = pwdHint
+
+    }
 
     @SuppressLint("CheckResult")
     private fun requestPermission() {
         val permissions = RxPermissions(this)
-        permissions.requestEach(
+        permissions.requestEachCombined(
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_PHONE_STATE
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
-            .subscribe({ }, { })
+            .subscribe({
+                when {
+                    it.granted -> {
+                        // `permission.name` is granted !
+                    }
+                    it.shouldShowRequestPermissionRationale -> {
+                        toast(this, "Denied permission，don't open the application ")
+                        finish()
+                        // Denied permission without ask never again
+                    }
+                    else -> {
+                        // Denied permission with ask never again
+                        // Need to go to the settings
+                        AlertDialog.Builder(this)
+                            .setMessage(
+                                "You do not allow the application to access the recording rights of the mobile phone," +
+                                        " the application can not be used normally, you can open it in the system settings."
+                            )
+                            .setNegativeButton(
+                                "Not"
+                            ) { dialog, _ ->
+                                dialog.dismiss()
+                                finish()
+                            }
+                            .setPositiveButton(
+                                "Go to system settings"
+                            ) { dialog, _ ->
+                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                val uri = Uri.fromParts("package", packageName, null)
+                                intent.data = uri
+                                startActivityForResult(intent, PERMISSION_REQUEST)
+                                dialog.dismiss()
+
+                            }
+                            .create()
+                            .show()
+
+                    }
+                }
+
+            }, {
+            })
     }
 
 
@@ -82,37 +121,58 @@ class LoginActivity : BaseMVPActivity<LoginContract.LoginView, LoginPresenter>()
      * 判断用户名和密码的相关正确性
      */
     private fun checkUtils(): Boolean {
+        if(TextUtils.isEmpty(mUserName) && TextUtils.isEmpty(mPwd)){
+            toast(this,"Please input user name and password")
+            return false
+        }
         if (TextUtils.isEmpty(mUserName)) {
-            toast(this, "请填写用户名")
+            toast(this, "Please input user name")
             return false
         }
         if (TextUtils.isEmpty(mPwd)) {
-            toast(this, "请填写密码")
+            toast(this, "Please input password")
             return false
         }
         return true
     }
 
     override fun setLayoutId(): Int {
-        return com.cgtn.minor.liveminority.R.layout.activity_login
+        return R.layout.activity_login
     }
 
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (System.currentTimeMillis() - mExitTime > 2000) {
-                toast(this, "再次点击退出App")
-                mExitTime = System.currentTimeMillis()
-            } else {
-                finish()
-            }
-            return true
+    override fun loginSuccess(it: String) {
+        LogUtil.e(it)
+        _login = true
+        _token = it
+        toast(this, "登录成功")
+        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+        finish()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PERMISSION_REQUEST) {
+            LogUtil.e("$requestCode")
+            val permissions = RxPermissions(this)
+            permissions.request(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+                .subscribe({
+                    if (it) {
+
+                    } else {
+                        finish()
+                    }
+                }, {
+                    finish()
+                })
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
         }
-        return super.onKeyDown(keyCode, event)
-    }
 
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
 

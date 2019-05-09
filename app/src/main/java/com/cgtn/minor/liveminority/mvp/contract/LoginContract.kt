@@ -7,12 +7,12 @@ import com.cgtn.minor.liveminority.base.BaseContract
  */
 interface LoginContract {
 
-    interface LoginView : BaseContract.View {
-        fun loginSuccess()
+    interface LoginView : BaseContract.BaseView {
+        fun loginSuccess(it: String)
     }
 
     interface Presenter : BaseContract.Presenter<LoginView> {
         //登录
-        fun login()
+        fun login(username: String, pwd: String)
     }
 }

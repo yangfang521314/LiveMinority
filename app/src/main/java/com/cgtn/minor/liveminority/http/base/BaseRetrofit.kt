@@ -35,7 +35,7 @@ abstract class BaseRetrofit {
      * 缓存设置时间
      */
     private fun getOkHttpClient(): OkHttpClient {
-        var mInterceptor = HttpLoggingInterceptor()
+        val mInterceptor = HttpLoggingInterceptor()
         mInterceptor.level = HttpLoggingInterceptor.Level.BODY
         return OkHttpClient.Builder()
             .addInterceptor(mInterceptor)
