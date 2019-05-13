@@ -6,22 +6,26 @@ import android.view.ViewGroup
 import com.cgtn.minor.liveminority.R
 import com.cgtn.minor.liveminority.mvp.model.TaskEntity
 import com.cgtn.minor.liveminority.widget.OnItemClickListener
-import kotlinx.android.synthetic.main.item_new_task.view.*
+import kotlinx.android.synthetic.main.item_task.view.*
 
 class TaskAdapter(
     taskList: List<TaskEntity>
-) : RecyclerView.Adapter<TaskAdapter.ItemViewHolder>() {
+) : RecyclerView.Adapter<ItemViewHolder>() {
 
 
     private var onItemClickListener: OnItemClickListener? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemViewHolder {
-        return ItemViewHolder(View.inflate(parent.context, R.layout.item_new_task, null))
+        return ItemViewHolder(View.inflate(parent.context, R.layout.item_task, null))
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         holder.itemView.task_title.text = mTaskEntity?.get(position)!!.headline
+        holder.itemView.task_id.text = (position+1).toString()
+        holder.itemView.task_live.setOnClickListener {
+            onItemClickListener?.onClickListener(holder.itemView, mTaskEntity!![position])
+        }
     }
     private var mTaskEntity: List<TaskEntity>? = taskList
 
@@ -33,8 +37,6 @@ class TaskAdapter(
         onItemClickListener = clickListener
 
     }
-
-    class ItemViewHolder(item: View) : RecyclerView.ViewHolder(item)
 
 
 }

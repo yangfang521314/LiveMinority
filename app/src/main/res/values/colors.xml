@@ -17,7 +17,6 @@
     <color name="moccasin">#ffe4b5</color> <!-- 鹿皮色 -->
     <color name="navajowhite">#ffdead</color> <!-- 纳瓦白 -->
     <color name="peachpuff">#ffdab9</color> <!-- 桃色 -->
-    <color name="gold">#ffd700</color> <!-- 金色 -->
     <color name="pink">#ffc0cb</color> <!-- 粉 -->
     <color name="lightpink">#ffb6c1</color> <!-- 亮粉 -->
     <color name="orange">#ffa500</color> <!-- 橙色 -->
@@ -164,5 +163,6 @@
     <color name="text_red_95">#E95850</color>
     <color name="text_purple">#9494E8</color>
     <color name="text_confirm">#7C51CB</color>
+    <color name="task_bg">#efefef</color>
 
 </resources>

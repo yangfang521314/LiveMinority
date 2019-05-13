@@ -6,18 +6,23 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.cgtn.minor.liveminority.R
 import com.cgtn.minor.liveminority.base.BaseMVPActivity
 import com.cgtn.minor.liveminority.mvp.contract.TaskContract
 import com.cgtn.minor.liveminority.mvp.model.TaskEntity
 import com.cgtn.minor.liveminority.mvp.presenter.TaskPresenter
+import com.cgtn.minor.liveminority.ui.adapter.CreateAdapter
 import com.cgtn.minor.liveminority.ui.adapter.TaskAdapter
 import com.cgtn.minor.liveminority.utils.LogUtil
+import com.cgtn.minor.liveminority.utils.SpaceItemDecoration
 import com.cgtn.minor.liveminority.utils.toast
 import com.cgtn.minor.liveminority.widget.OnItemClickListener
+import com.cgtn.minor.liveminority.widget.recyclerview.OnItemMenuClickListener
 import com.example.yangfang.kotlindemo.util.SharedPreferenceUtil
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
+
+
+
 
 class MainActivity : BaseMVPActivity<TaskContract.TaskView, TaskPresenter>(),
     View.OnClickListener, OnItemClickListener, TaskContract.TaskView {
@@ -40,7 +45,7 @@ class MainActivity : BaseMVPActivity<TaskContract.TaskView, TaskPresenter>(),
 
 
     override fun setLayoutId(): Int =
-        R.layout.activity_main
+        com.cgtn.minor.liveminority.R.layout.activity_main
 
     override fun initData() {
         super.initData()
@@ -58,16 +63,47 @@ class MainActivity : BaseMVPActivity<TaskContract.TaskView, TaskPresenter>(),
 
     override fun initView() {
         rcy_task.layoutManager = LinearLayoutManager(this)
+        rcy_task.addItemDecoration(SpaceItemDecoration(34))
         val taskEntity = TaskEntity(1, "Live:30 day countdown to 2019 Beijing international H", "", "")
-        val data: List<TaskEntity> = mutableListOf(taskEntity, taskEntity, taskEntity)
+        val data: List<TaskEntity> = mutableListOf(taskEntity, taskEntity, taskEntity, taskEntity,taskEntity,taskEntity,taskEntity,taskEntity,taskEntity)
         LogUtil.e("${data.size}")
         mTaskAdapter = TaskAdapter(data)
         mTaskAdapter!!.setOnClickListener(this)
         rcy_task.adapter = mTaskAdapter
         setToolBar()
 
+//        // 设置监听器。
+//        val mSwipeMenuCreator = SwipeMenuCreator { leftMenu, rightMenu, position ->
+//            val deleteItem =  SwipeMenuItem(this)
+//            deleteItem.setImage(R.mipmap.delete)
+//            deleteItem.height = Dp2Px.convert(this,72f)
+//            deleteItem.setBackground(R.color.red)
+//            val addItem = SwipeMenuItem(this)
+//            addItem.setImage(R.mipmap.add_task)
+//            rightMenu.addMenuItem(addItem)
+//            rightMenu.addMenuItem(deleteItem) // 在Item右侧添加一个菜单。
+//
+//        }
+//        rcy_create.setSwipeMenuCreator(mSwipeMenuCreator)
         rcy_create.layoutManager = LinearLayoutManager(this)
+//        rcy_create.setOnItemMenuClickListener(mItemMenuClickListener)
 
+        val mAdapter = CreateAdapter()
+        mAdapter.setData(data)
+        rcy_create.adapter = mAdapter
+        // 菜单点击监听。
+
+
+    }
+
+    private val mItemMenuClickListener = OnItemMenuClickListener { menuBridge, position ->
+        // 任何操作必须先关闭菜单，否则可能出现Item菜单打开状态错乱。
+        menuBridge.closeMenu()
+
+        // 左侧还是右侧菜单：
+        val direction = menuBridge.direction
+        // 菜单在Item中的Position：
+        val menuPosition = menuBridge.position
     }
 
 
@@ -89,7 +125,7 @@ class MainActivity : BaseMVPActivity<TaskContract.TaskView, TaskPresenter>(),
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item!!.itemId == R.id.task_add) {
+        if (item!!.itemId == com.cgtn.minor.liveminority.R.id.task_add) {
             toast(this, "hello")
         }
         return super.onOptionsItemSelected(item)
@@ -105,7 +141,7 @@ class MainActivity : BaseMVPActivity<TaskContract.TaskView, TaskPresenter>(),
 //        return false
 //    }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
+        menuInflater.inflate(com.cgtn.minor.liveminority.R.menu.main, menu)
         return true
     }
 
@@ -129,7 +165,7 @@ class MainActivity : BaseMVPActivity<TaskContract.TaskView, TaskPresenter>(),
      */
     override fun onClickListener(view: View, json: Any) {
         LogUtil.e(json.toString())
-        rtmp_url = json as String
+        toast(this, "live task")
     }
 
 
