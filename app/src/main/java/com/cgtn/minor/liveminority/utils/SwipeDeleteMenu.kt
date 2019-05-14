@@ -42,8 +42,8 @@ class SwipeDeleteMenu @JvmOverloads constructor(context: Context, attrs: Attribu
 
     private var mFirstX: Float = 0F
     private var mLastX: Float = 0f
-    private var mFirstY:Float = 0F
-    private var mLastY:Float = 0F
+    private var mFirstY: Float = 0F
+    private var mLastY: Float = 0F
 
     // 用户是否点击了内容区
     private var isContentDown = true
@@ -98,6 +98,7 @@ class SwipeDeleteMenu @JvmOverloads constructor(context: Context, attrs: Attribu
         mLimitDistance = mRightMenuWidthMeasured * 5 / 10
     }
 
+
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
 
         if (mTracker == null) {
@@ -107,11 +108,13 @@ class SwipeDeleteMenu @JvmOverloads constructor(context: Context, attrs: Attribu
 
         when (ev.action) {
             MotionEvent.ACTION_DOWN -> {
-
+                LogUtil.e("dispatch down2")
                 isContentDown = true
 
                 mFirstX = ev.rawX
                 mLastX = ev.rawX
+                mFirstY = ev.rawY
+                mLastY = ev.rawY
 
                 if (sMenu != null) {
                     if (sMenu !== this) {
@@ -122,11 +125,13 @@ class SwipeDeleteMenu @JvmOverloads constructor(context: Context, attrs: Attribu
                 mPointerId = ev.getPointerId(0)
             }
             MotionEvent.ACTION_MOVE -> {
-
+                LogUtil.e("dispatch move2")
                 val swipeDistance = mLastX - ev.rawX
+                val swipeDistanceY = mLastY - ev.rawY
+                LogUtil.e("$swipeDistance")
 
                 // 手指在滑动
-                if (Math.abs(swipeDistance) > mScaledTouchSlop) {
+                if (Math.abs(swipeDistance) > mScaledTouchSlop ) {
                     isContentDown = false
                 }
 
@@ -135,24 +140,26 @@ class SwipeDeleteMenu @JvmOverloads constructor(context: Context, attrs: Attribu
                 if (scrollX < 0) {
                     scrollTo(0, 0)
                 }
-                if (scrollX > mRightMenuWidthMeasured) {
+                if (scrollX > mRightMenuWidthMeasured ) {
                     scrollTo(mRightMenuWidthMeasured, 0)
                 }
 
                 mLastX = ev.rawX
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                LogUtil.e("dispatch up2 ")
 
                 mTracker!!.computeCurrentVelocity(1000, mMaxFlingVelocity.toFloat())
                 val velocityX = mTracker!!.getXVelocity(mPointerId)
-                if (Math.abs(velocityX) > 1000) {
+                LogUtil.e("$velocityX,$scrollX")
+                if (Math.abs(velocityX) > 1000 ) {
                     if (velocityX < -1000) {
                         showMenu(true)
                     } else {
                         showMenu(false)
                     }
                 } else {
-                    if (Math.abs(scrollX) > mLimitDistance) {
+                    if (Math.abs(scrollX) > mLimitDistance ) {
                         showMenu(true)
                     } else {
                         showMenu(false)
@@ -168,13 +175,21 @@ class SwipeDeleteMenu @JvmOverloads constructor(context: Context, attrs: Attribu
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         when (ev.action) {
             MotionEvent.ACTION_DOWN -> {
+                LogUtil.e("intercept down1")
             }
-            MotionEvent.ACTION_MOVE -> if (Math.abs(ev.rawX - mFirstX) > mScaledTouchSlop) {
-                return true
+            MotionEvent.ACTION_MOVE ->
+                if (Math.abs(ev.rawX - mFirstX) > mScaledTouchSlop)
+             {
+                    LogUtil.e("intercept move1")
+
+                    return true
             }
+
             MotionEvent.ACTION_UP -> if (scrollX > mScaledTouchSlop) {
                 // 判断点击的是右侧删除按钮还是左侧内容区
                 if (ev.x < width - scrollX) {
+                    LogUtil.e("intercept up1 ")
+
                     if (isContentDown) {
                         showMenu(false)
                     }
@@ -230,14 +245,14 @@ class SwipeDeleteMenu @JvmOverloads constructor(context: Context, attrs: Attribu
             mShowAnimator = ValueAnimator.ofInt(scrollX, mRightMenuWidthMeasured)
             mShowAnimator!!.addUpdateListener { animation -> scrollTo(animation.animatedValue as Int, 0) }
             mShowAnimator!!.interpolator = OvershootInterpolator()
-            mShowAnimator!!.setDuration(300).start()
+            mShowAnimator!!.start()
         } else {
             sMenu = null
 
             mCloseAnimator = ValueAnimator.ofInt(scrollX, 0)
             mCloseAnimator!!.addUpdateListener { animation -> scrollTo(animation.animatedValue as Int, 0) }
             mCloseAnimator!!.interpolator = AccelerateInterpolator()
-            mCloseAnimator!!.setDuration(300).start()
+            mCloseAnimator!!.start()
         }
     }
 

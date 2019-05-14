@@ -27,5 +27,8 @@
         <attr name="leftViewId" format="reference|integer"/>
         <attr name="rightViewId" format="reference|integer"/>
         <attr name="contentViewId" format="reference|integer"/>
+        <attr name="swipeEnable" format="boolean"/>
+        <attr name="ios" format="boolean"/>
+        <attr name="leftSwipe" format="boolean"/>
     </declare-styleable>
 </resources>

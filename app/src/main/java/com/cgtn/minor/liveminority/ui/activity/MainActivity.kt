@@ -1,6 +1,5 @@
 package com.cgtn.minor.liveminority.ui.activity
 
-import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import android.view.KeyEvent
 import android.view.Menu
@@ -49,11 +48,11 @@ class MainActivity : BaseMVPActivity<TaskContract.TaskView, TaskPresenter>(),
 
     override fun initData() {
         super.initData()
-        if (!_login) {
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-            return
-        }
+//        if (!_login) {
+//            startActivity(Intent(this, LoginActivity::class.java))
+//            finish()
+//            return
+//        }
         mPresenter = TaskPresenter()
         mPresenter!!.attach(this)
         mPresenter!!.getTaskData(_username, _token)

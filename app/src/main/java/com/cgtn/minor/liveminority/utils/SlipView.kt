@@ -2,7 +2,6 @@ package com.cgtn.minor.liveminority.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.method.Touch.scrollTo
 import android.util.AttributeSet
 import android.view.*
 import android.widget.Scroller
@@ -223,42 +222,29 @@ class SlipView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 lastX = x
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-//                val dx: Int
-//                hasConsumeDownEventByChild = true
-//                val deltaX = lastX - x
-//                val xVelocity = xVelocity          //通过加速度方向来判断手指抬起时正在朝哪边滚动
-//                LogUtil.e("$xVelocity")
-//                dx = when {
-//                    (xVelocity <= 0 && deltaX < 0) -> menuWidth - scrollX
-//                    (xVelocity > 0) -> -scrollX
-//                    scrollX >= menuWidth / 2 -> menuWidth - scrollX
-//                    else -> -scrollX
-//                }
-//                LogUtil.e("$dx")
-//
-//                if (onScrollListener != null) {
-//                    isScrolling = true
-//                    onScrollListener!!.onScrollStart()
-//                }
-//                scroller!!.startScroll(scrollX, 0, dx, 0)
-//                invalidate()
-//
-//                clearTracker()
-//                lastX = x
-                if (Math.abs(xVelocity) > 1000) {
-                    if (xVelocity < -1000) {
-                        showMenu(true)
-                    } else {
-                        showMenu(false)
-                    }
-                } else {
-                    if (Math.abs(scrollX) > mLimitDistance) {
-                        showMenu(true)
-                    } else {
-                        showMenu(false)
-                    }
+                val dx: Int
+                hasConsumeDownEventByChild = true
+                val deltaX = lastX - x
+                val xVelocity = xVelocity          //通过加速度方向来判断手指抬起时正在朝哪边滚动
+                LogUtil.e("$xVelocity")
+                dx = when {
+                    (xVelocity <= 0 && deltaX < 0) -> menuWidth - scrollX
+                    (xVelocity > 0) -> -scrollX
+                    scrollX >= menuWidth / 2 -> menuWidth - scrollX
+                    else -> -scrollX
                 }
+                LogUtil.e("$dx")
+
+                if (onScrollListener != null) {
+                    isScrolling = true
+                    onScrollListener!!.onScrollStart()
+                }
+                scroller!!.startScroll(scrollX, 0, dx, 0)
+                invalidate()
+
                 clearTracker()
+                lastX = x
+
             }
         }
 

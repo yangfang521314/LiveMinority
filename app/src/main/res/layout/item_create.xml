@@ -6,11 +6,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <com.cgtn.minor.liveminority.utils.SwipeDeleteMenu
+    <com.cgtn.minor.liveminority.widget.SwipeMenu
             app:cardCornerRadius="3dp"
             android:id="@+id/card_view"
+            app:ios="false"
             app:cardBackgroundColor="@color/white"
             android:layout_width="match_parent"
+            android:clickable="true"
             android:layout_height="match_parent">
 
         <LinearLayout
@@ -50,7 +52,6 @@
                     android:layout_height="wrap_content"/>
         </LinearLayout>
 
-
         <ImageView
                 android:id="@+id/menu_delete"
                 android:layout_width="wrap_content"
@@ -66,7 +67,7 @@
                 android:src="@mipmap/delete"
                 android:background="#00ff88"
                 />
-    </com.cgtn.minor.liveminority.utils.SwipeDeleteMenu>
+    </com.cgtn.minor.liveminority.widget.SwipeMenu>
 
 
     <TextView
