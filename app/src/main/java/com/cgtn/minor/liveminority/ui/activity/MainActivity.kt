@@ -5,22 +5,26 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
+import com.cgtn.minor.liveminority.R
 import com.cgtn.minor.liveminority.base.BaseMVPActivity
+import com.cgtn.minor.liveminority.contants.Constants.Companion.CREATE
+import com.cgtn.minor.liveminority.contants.Constants.Companion.HEADER
+import com.cgtn.minor.liveminority.contants.Constants.Companion.TASK
 import com.cgtn.minor.liveminority.mvp.contract.TaskContract
+import com.cgtn.minor.liveminority.mvp.model.CommonListEntity
 import com.cgtn.minor.liveminority.mvp.model.TaskEntity
 import com.cgtn.minor.liveminority.mvp.presenter.TaskPresenter
-import com.cgtn.minor.liveminority.ui.adapter.CreateAdapter
 import com.cgtn.minor.liveminority.ui.adapter.TaskAdapter
 import com.cgtn.minor.liveminority.utils.LogUtil
 import com.cgtn.minor.liveminority.utils.SpaceItemDecoration
 import com.cgtn.minor.liveminority.utils.toast
 import com.cgtn.minor.liveminority.widget.OnItemClickListener
-import com.cgtn.minor.liveminority.widget.recyclerview.OnItemMenuClickListener
+import com.cgtn.minor.liveminority.widget.stickyitemdecoration.OnStickyChangeListener
+import com.cgtn.minor.liveminority.widget.stickyitemdecoration.StickyItemDecoration
 import com.example.yangfang.kotlindemo.util.SharedPreferenceUtil
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
-
-
 
 
 class MainActivity : BaseMVPActivity<TaskContract.TaskView, TaskPresenter>(),
@@ -42,6 +46,8 @@ class MainActivity : BaseMVPActivity<TaskContract.TaskView, TaskPresenter>(),
     //判断是否登录
     private var _login by SharedPreferenceUtil("login", false)
 
+    private val data = ArrayList<CommonListEntity>()
+
 
     override fun setLayoutId(): Int =
         com.cgtn.minor.liveminority.R.layout.activity_main
@@ -58,51 +64,78 @@ class MainActivity : BaseMVPActivity<TaskContract.TaskView, TaskPresenter>(),
         mPresenter!!.getTaskData(_username, _token)
         //测试上传速度的接口
 //        mPresenter!!.postData()
+        if (data.isNotEmpty()) {
+            data.clear()
+        }
+        val taskEntity = TaskEntity(1, "Live:30 day countdown to 2019 Beijing international H", "", "")
+        val taskList: List<TaskEntity> = mutableListOf(
+            taskEntity,
+            taskEntity,
+            taskEntity,
+            taskEntity,
+            taskEntity,
+            taskEntity,
+            taskEntity,
+            taskEntity,
+            taskEntity
+        )
+        var count = 0
+
+        for (i in taskList.indices) {
+            if (count == 0) {
+                val commonListEntity = CommonListEntity(HEADER, "Task", null)
+                data.add(commonListEntity)
+                count++
+            } else {
+                val commonListEntity = CommonListEntity(TASK, "", taskList[i])
+                data.add(commonListEntity)
+                count++
+
+            }
+        }
+        count = 0
+        for (i in taskList.indices) {
+            if (count == 0) {
+                val commonListEntity = CommonListEntity(HEADER, "Create", null)
+                data.add(commonListEntity)
+                count++
+            } else {
+                val commonListEntity = CommonListEntity(CREATE, "", taskList[i])
+                data.add(commonListEntity)
+                count++
+            }
+        }
     }
 
     override fun initView() {
-        rcy_task.layoutManager = LinearLayoutManager(this)
-        rcy_task.addItemDecoration(SpaceItemDecoration(34))
-        val taskEntity = TaskEntity(1, "Live:30 day countdown to 2019 Beijing international H", "", "")
-        val data: List<TaskEntity> = mutableListOf(taskEntity, taskEntity, taskEntity, taskEntity,taskEntity,taskEntity,taskEntity,taskEntity,taskEntity)
-        LogUtil.e("${data.size}")
         mTaskAdapter = TaskAdapter(data)
-        mTaskAdapter!!.setOnClickListener(this)
-        rcy_task.adapter = mTaskAdapter
-        setToolBar()
 
-//        // 设置监听器。
-//        val mSwipeMenuCreator = SwipeMenuCreator { leftMenu, rightMenu, position ->
-//            val deleteItem =  SwipeMenuItem(this)
-//            deleteItem.setImage(R.mipmap.delete)
-//            deleteItem.height = Dp2Px.convert(this,72f)
-//            deleteItem.setBackground(R.color.red)
-//            val addItem = SwipeMenuItem(this)
-//            addItem.setImage(R.mipmap.add_task)
-//            rightMenu.addMenuItem(addItem)
-//            rightMenu.addMenuItem(deleteItem) // 在Item右侧添加一个菜单。
-//
-//        }
-//        rcy_create.setSwipeMenuCreator(mSwipeMenuCreator)
-        rcy_create.layoutManager = LinearLayoutManager(this)
-//        rcy_create.setOnItemMenuClickListener(mItemMenuClickListener)
+        header.setDataCallback { pos ->
+            val item = mTaskAdapter!!.getData()?.get(pos)?.title
+            header.findViewById<TextView>(R.id.tv_header).text = item
 
-        val mAdapter = CreateAdapter()
-        mAdapter.setData(data)
-        rcy_create.adapter = mAdapter
-        // 菜单点击监听。
+        }
 
+        val stickyItemDecoration = StickyItemDecoration(header, HEADER)
 
-    }
+        stickyItemDecoration.setOnStickyChangeListener(object : OnStickyChangeListener {
+            override fun onScrollable(offset: Int) {
+                header.scrollChild(offset)
+                header.visibility = View.VISIBLE
+            }
 
-    private val mItemMenuClickListener = OnItemMenuClickListener { menuBridge, position ->
-        // 任何操作必须先关闭菜单，否则可能出现Item菜单打开状态错乱。
-        menuBridge.closeMenu()
+            override fun onInVisible() {
+                header.reset()
+                header.visibility = View.INVISIBLE
+            }
+        })
+        rcy.addItemDecoration(stickyItemDecoration)
+        rcy.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        rcy.addItemDecoration(stickyItemDecoration)
+        rcy.addItemDecoration(SpaceItemDecoration(34))
+        LogUtil.e("${data.size}")
+        rcy.adapter = mTaskAdapter
 
-        // 左侧还是右侧菜单：
-        val direction = menuBridge.direction
-        // 菜单在Item中的Position：
-        val menuPosition = menuBridge.position
     }
 
 
@@ -190,5 +223,6 @@ class MainActivity : BaseMVPActivity<TaskContract.TaskView, TaskPresenter>(),
             mDispose!!.dispose()
         }
     }
+
 
 }

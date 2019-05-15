@@ -28,6 +28,7 @@ class TaskPresenter : BasePresenter<TaskContract.TaskView>(), TaskContract.Prese
 
     }
 
+    @SuppressLint("CheckResult")
     fun postData() {
         val testString = "com,comsdsdm.ddsvcscssssdsfsaldsl;"
         val map = HashMap<String, String>()
