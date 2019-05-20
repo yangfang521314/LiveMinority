@@ -16,15 +16,17 @@ class TaskPresenter : BasePresenter<TaskContract.TaskView>(), TaskContract.Prese
     @SuppressLint("CheckResult")
     override fun getTaskData(username: String, token: String) {
         val map = HashMap<String, String>()
-        map["username"] = username
+        map["userAccount"] = username
         map["token"] = token
         CommonRetrofitManager.commonRetrofitManager.getTaskData(getGson(map))
             .compose(RxUtils.rxObScheduleHelper())
             .subscribe({
                 mView!!.showTaskData(it)
+
             }, { t: Throwable? ->
                 LogUtil.e("$t")
-                mView!!.showErrorMsg(t!!.message!!) })
+                mView!!.showErrorMsg(t!!.message!!)
+            })
 
     }
 
@@ -40,6 +42,21 @@ class TaskPresenter : BasePresenter<TaskContract.TaskView>(), TaskContract.Prese
             }, { t: Throwable? -> mView!!.showErrorMsg(t!!.message!!) })
 
     }
+
+//    fun getCreateData() {
+//        Observable.create(ObservableOnSubscribe<List<TaskEntity>> {
+//            val taskList = DBHelper.mInstance.getTaskDao().getTaskData()
+//            it.onNext(taskList)
+//        }).subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe {
+//                if (it != null && it.isNotEmpty()) {
+//                    LogUtil.e("${it.size}")
+//                    mView!!.showCreateData(it)
+//                }
+//            }
+//
+//    }
 
 
 }

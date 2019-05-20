@@ -6,7 +6,7 @@ import android.content.Context
 import android.net.*
 import android.os.Build
 import android.support.annotation.RequiresPermission
-import com.cgtn.minor.liveminority.widget.NetWorkListener
+import com.cgtn.minor.liveminority.widget.listener.NetWorkListener
 
 
 /**

@@ -4,22 +4,20 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.cgtn.minor.liveminority.app.LiveApplication
 import com.cgtn.minor.liveminority.contants.Constants
+import com.cgtn.minor.liveminority.contants.Constants.Companion.HEADER
 import com.cgtn.minor.liveminority.mvp.model.CommonListEntity
-import com.cgtn.minor.liveminority.utils.toast
-import com.cgtn.minor.liveminority.widget.OnItemClickListener
 import com.cgtn.minor.liveminority.widget.SwipeMenu
+import com.cgtn.minor.liveminority.widget.listener.OnItemClickListener
 import com.cgtn.minor.liveminority.widget.stickyitemdecoration.FullSpanUtil
+import kotlinx.android.synthetic.main.item_header.view.*
 import kotlinx.android.synthetic.main.item_task.view.*
 
 
 class TaskAdapter(
-    taskList: List<CommonListEntity>
 ) : RecyclerView.Adapter<ItemViewHolder>() {
 
 
-    private val TYPE_STICKY_HEAD: Int = 5
     private var onItemClickListener: OnItemClickListener? = null
 
 
@@ -27,9 +25,9 @@ class TaskAdapter(
         var viewHolder: ItemViewHolder? = null
 
         when (viewType) {
-            Constants.HEADER -> {
+            HEADER -> {
                 val view = LayoutInflater.from(parent.context)
-                    .inflate(com.cgtn.minor.liveminority.R.layout.item_task, parent, false)
+                    .inflate(com.cgtn.minor.liveminority.R.layout.item_header, parent, false)
                 viewHolder = ItemViewHolder(view, viewType)
             }
             Constants.CREATE,
@@ -46,28 +44,29 @@ class TaskAdapter(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        FullSpanUtil.onAttachedToRecyclerView(recyclerView, this, TYPE_STICKY_HEAD)
+        FullSpanUtil.onAttachedToRecyclerView(recyclerView, this, HEADER)
     }
 
     override fun onViewAttachedToWindow(holder: ItemViewHolder) {
         super.onViewAttachedToWindow(holder)
-        FullSpanUtil.onViewAttachedToWindow(holder, this, TYPE_STICKY_HEAD)
+        FullSpanUtil.onViewAttachedToWindow(holder, this, HEADER)
     }
 
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         when (holder.itemViewType) {
-//            Constants.HEADER -> {
-//                holder.itemView.tv_header.text = data!![position].title
-//            }
-            Constants.TASK ->{
+            HEADER -> {
+                holder.itemView.tv_header.text = data!![position].title
+            }
+            Constants.TASK -> {
                 holder.itemView.task_title.text = data!![position].list!!.headline
 
                 holder.itemView.card_view.isSwipeEnable = false
 
                 holder.itemView.task_live.setOnClickListener {
-                    toast(LiveApplication.mInstance!!.baseContext,"fuck")
+                    onItemClickListener!!.onClickListener(it, data!![position].list!!)
                 }
+                holder.itemView.task_id.text = data!![position].list!!.id.toString()
             }
             Constants.CREATE -> {
                 holder.itemView.task_title.text = data!![position].list!!.headline
@@ -81,21 +80,28 @@ class TaskAdapter(
                         holder.itemView.task_live.visibility = View.INVISIBLE
                     }
 
-
                 })
 
                 holder.itemView.task_live.setOnClickListener {
-
+                    onItemClickListener!!.onClickListener(it, data!![position].list!!)
                 }
+
+                holder.itemView.menu_edit.setOnClickListener {
+                    onItemClickListener!!.onShowMenuPop()
+                }
+                holder.itemView.task_id.text = data!![position].list!!.id.toString()
+
             }
+
         }
 
     }
 
-    private var data: List<CommonListEntity>? = taskList
+
+    private var data: List<CommonListEntity>? = ArrayList()
 
     override fun getItemCount(): Int {
-        return if (data!!.isEmpty()) 0 else data!!.size
+        return if (data == null && data!!.isEmpty()) 0 else data!!.size
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -109,6 +115,11 @@ class TaskAdapter(
 
     fun getData(): List<CommonListEntity>? {
         return data
+    }
+
+    fun setData(taskList: ArrayList<CommonListEntity>) {
+        data = taskList
+
     }
 
 

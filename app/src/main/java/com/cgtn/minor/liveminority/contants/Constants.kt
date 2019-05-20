@@ -11,5 +11,7 @@ class Constants {
         const val TASK = 3
         const val CREATE = 4
         const val EMPTY = 0
+        const val NORMAL_ALPHA = 1.0f
+        const val CHANGE_ALPHA = 0.4f
     }
 }

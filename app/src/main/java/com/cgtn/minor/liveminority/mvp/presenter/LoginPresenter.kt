@@ -20,7 +20,7 @@ class LoginPresenter : BasePresenter<LoginContract.LoginView>(), LoginContract.P
     @SuppressLint("CheckResult")
     override fun login(username: String, pwd: String) {
         val map = HashMap<String, String>()
-        map["username"] = username
+        map["userAccount"] = username
         map["password"] = pwd
         CommonRetrofitManager.commonRetrofitManager.login(getGson(map))
             .compose(RxUtils.rxObScheduleHelper())

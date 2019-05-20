@@ -2,22 +2,20 @@ package com.cgtn.minor.liveminority.ui.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
-import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
 import com.cgtn.minor.liveminority.R
-import com.cgtn.minor.liveminority.mvp.model.BaseStreamConfig
+import com.cgtn.minor.liveminority.mvp.model.TaskEntity
+import com.cgtn.minor.liveminority.utils.LogUtil
 import com.cgtn.minor.liveminority.utils.toast
-import com.ksyun.media.streamer.encoder.VideoEncodeFormat
 import com.ksyun.media.streamer.kit.KSYStreamer
 import com.ksyun.media.streamer.kit.StreamerConstants
 import com.ksyun.media.streamer.kit.StreamerConstants.*
@@ -30,16 +28,16 @@ import java.util.concurrent.TimeUnit
 /**
  * created by yf on 2019/4/18.
  */
-open class LiveCameraActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
+open class LiveVideoActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
     companion object {
         protected const val PERMISSION_REQUEST_CAMERA_AUDIOREC = 1
+        private val TAG = LiveVideoActivity::class.java.simpleName
 
     }
 
-    private lateinit var mConfig: BaseStreamConfig
+    private lateinit var mTaskEntity: TaskEntity
     private var mStreamer: KSYStreamer? = null
-    private val TAG = LiveCameraActivity::class.java.simpleName
     private var mStreaming: Boolean = true
     private var mIsFlashOpened: Boolean = false
     private var mSWEncoderUnsupported: Boolean = false
@@ -65,10 +63,22 @@ open class LiveCameraActivity : AppCompatActivity(), ActivityCompat.OnRequestPer
                     or View.SYSTEM_UI_FLAG_FULLSCREEN
                     or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
         }
-        mConfig = getConfig(intent.extras)
+        initTaskConfig()
         compositeDisposable = CompositeDisposable()
         mStreamer = KSYStreamer(this)
         initConfig()
+    }
+
+    private fun initTaskConfig() {
+        if (intent.extras != null) {
+            val bundle = intent.extras
+            if (bundle!!["task"] != null) {
+                val data = bundle["task"]
+                mTaskEntity = TaskEntity(0, "", "", "", "")
+                    .fromJson(data!!.toString())
+                LogUtil.e("$mTaskEntity")
+            }
+        }
     }
 
 
@@ -87,54 +97,50 @@ open class LiveCameraActivity : AppCompatActivity(), ActivityCompat.OnRequestPer
         }
     }
 
-    private fun getConfig(bundle: Bundle?): BaseStreamConfig {
-        return BaseStreamConfig().fromJson(bundle!!.getString("config"))
-    }
-
     private fun initConfig() {
-        Log.e("LiveCamera", mConfig.toJson())
-        if (!TextUtils.isEmpty(mConfig.mUrl)) {
-            mStreamer!!.url = mConfig.mUrl
-        } else {
-            toast(this, "地址为空")
-        }
-        // 设置推流分辨率
-        mStreamer!!.setPreviewResolution(mConfig.mTargetResolution)
-        mStreamer!!.setTargetResolution(mConfig.mTargetResolution)
-
-        mStreamer!!.videoEncodeMethod = mConfig.mEncodeMethod
-        mStreamer!!.cameraFacing = mConfig.mCameraFacing
-
-        // 硬编模式下默认使用高性能模式(high profile)
-        if (mConfig.mEncodeMethod == StreamerConstants.ENCODE_METHOD_HARDWARE) {
-            mStreamer!!.videoEncodeProfile = VideoEncodeFormat.ENCODE_PROFILE_HIGH_PERFORMANCE
-        }
-        // 设置推流帧率
-        if (mConfig.mFrameRate > 0) {
-            mStreamer!!.previewFps = mConfig.mFrameRate
-            mStreamer!!.targetFps = mConfig.mFrameRate
-        }
-        // 设置推流视频码率，三个参数分别为初始码率、最高码率、最低码率
-        val videoBitrate = mConfig.mVideoKBitrate
-        if (videoBitrate > 0) {
-            mStreamer!!.setVideoKBitrate(videoBitrate * 3 / 4, videoBitrate, videoBitrate / 4)
-        }
-
-        // 设置音频码率
-        if (mConfig.mAudioKBitrate > 0) {
-            mStreamer!!.setAudioKBitrate(mConfig.mAudioKBitrate)
-        }
-
-        // 设置视频方向（横屏、竖屏）
-        if (mConfig.mOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-//            mIsLandscape = true
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            mStreamer!!.rotateDegrees = 90
-        } else if (mConfig.mOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-//            mIsLandscape = false
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            mStreamer!!.rotateDegrees = 0
-        }
+//        Log.e("LiveCamera", mConfig.toJson())
+//        if (!TextUtils.isEmpty(mConfig.mUrl)) {
+//            mStreamer!!.url = mConfig.mUrl
+//        } else {
+//            toast(this, "地址为空")
+//        }
+//        // 设置推流分辨率
+//        mStreamer!!.setPreviewResolution(mConfig.mTargetResolution)
+//        mStreamer!!.setTargetResolution(mConfig.mTargetResolution)
+//
+//        mStreamer!!.videoEncodeMethod = mConfig.mEncodeMethod
+//        mStreamer!!.cameraFacing = mConfig.mCameraFacing
+//
+//        // 硬编模式下默认使用高性能模式(high profile)
+//        if (mConfig.mEncodeMethod == StreamerConstants.ENCODE_METHOD_HARDWARE) {
+//            mStreamer!!.videoEncodeProfile = VideoEncodeFormat.ENCODE_PROFILE_HIGH_PERFORMANCE
+//        }
+//        // 设置推流帧率
+//        if (mConfig.mFrameRate > 0) {
+//            mStreamer!!.previewFps = mConfig.mFrameRate
+//            mStreamer!!.targetFps = mConfig.mFrameRate
+//        }
+//        // 设置推流视频码率，三个参数分别为初始码率、最高码率、最低码率
+//        val videoBitrate = mConfig.mVideoKBitrate
+//        if (videoBitrate > 0) {
+//            mStreamer!!.setVideoKBitrate(videoBitrate * 3 / 4, videoBitrate, videoBitrate / 4)
+//        }
+//
+//        // 设置音频码率
+//        if (mConfig.mAudioKBitrate > 0) {
+//            mStreamer!!.setAudioKBitrate(mConfig.mAudioKBitrate)
+//        }
+//
+//        // 设置视频方向（横屏、竖屏）
+//        if (mConfig.mOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+////            mIsLandscape = true
+//            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+//            mStreamer!!.rotateDegrees = 90
+//        } else if (mConfig.mOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+////            mIsLandscape = false
+//            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+//            mStreamer!!.rotateDegrees = 0
+//        }
 
         // 设置预览View
         setDisplayPreview()

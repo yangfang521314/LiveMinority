@@ -5,7 +5,7 @@
     <item
             android:id="@+id/task_add"
             android:orderInCategory="90"
-            android:icon="@mipmap/back"
+            android:icon="@mipmap/menu_create"
             app:showAsAction="ifRoom"
             android:title=""/>
 

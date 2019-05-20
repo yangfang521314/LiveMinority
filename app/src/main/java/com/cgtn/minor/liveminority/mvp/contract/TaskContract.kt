@@ -8,10 +8,11 @@ import com.cgtn.minor.liveminority.mvp.model.TaskEntity
  */
 interface TaskContract {
     interface TaskView : BaseContract.BaseView {
-        fun showTaskData(it: List<TaskEntity>)
+        fun showTaskData(it: List<TaskEntity>?)
 
 
         fun showPerformanceTest(it: String?)
+//        fun showCreateData(it: List<TaskEntity>?)
     }
 
     interface Presenter : BaseContract.Presenter<TaskView> {

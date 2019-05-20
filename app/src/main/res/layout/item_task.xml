@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.cgtn.minor.liveminority.widget.SwipeMenu
+<LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:id="@+id/card_view"
-        app:ios="false"
-        app:cardCornerRadius="3dp"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-
+    <com.cgtn.minor.liveminority.widget.SwipeMenu
+            app:cardCornerRadius="3dp"
+            android:id="@+id/card_view"
+            app:ios="false"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         <LinearLayout
                 android:gravity="center"
@@ -26,7 +28,7 @@
                     android:textColor="#bfae62"
                     android:layout_height="wrap_content"
                     android:text="01"
-                    android:layout_marginLeft="6dp"
+                    android:gravity="center"
                     android:textSize="22sp"/>
 
             <TextView
@@ -50,7 +52,7 @@
                     android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <ImageView
+        <ImageButton
                 android:id="@+id/menu_edit"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
@@ -58,22 +60,23 @@
                 android:src="@mipmap/menu_edit"
                 />
 
-        <ImageView
+        <ImageButton
                 android:id="@+id/menu_delete"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:src="@mipmap/menu_delete"
                 android:background="#ff0200"
                 />
-</com.cgtn.minor.liveminority.widget.SwipeMenu>
+    </com.cgtn.minor.liveminority.widget.SwipeMenu>
 
 
-    <!--<TextView-->
-            <!--android:gravity="end"-->
-            <!--android:layout_marginTop="10dp"-->
-            <!--android:textSize="18sp"-->
-            <!--android:textColor="@color/text_color_66"-->
-            <!--android:text="rtmp://sdsdkskdfffff"-->
-            <!--android:layout_marginBottom="10dp"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="23dp"/>-->
+    <TextView
+            android:gravity="end"
+            android:layout_marginTop="10dp"
+            android:textSize="18sp"
+            android:textColor="#777778"
+            android:text="rtmp://sdsdkskdfffff"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="23dp"/>
+</LinearLayout>
