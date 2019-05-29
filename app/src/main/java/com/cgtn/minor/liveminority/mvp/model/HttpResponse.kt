@@ -1,4 +1,4 @@
-package com.cgtn.minor.liveminority.mvp.model
+package com.cgtn.minor.liveminority.mvp.data
 
 /**
  * created by yf on 2019/4/19.

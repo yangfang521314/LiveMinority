@@ -1,4 +1,4 @@
-package com.cgtn.minor.liveminority.mvp.model
+package com.cgtn.minor.liveminority.mvp.data
 
 import android.content.pm.ActivityInfo
 import com.cgtn.minor.liveminority.BuildConfig
@@ -8,14 +8,17 @@ import com.ksyun.media.streamer.kit.StreamerConstants
 import com.ksyun.media.streamer.kit.StreamerConstants.ENCODE_METHOD_SOFTWARE_COMPAT
 
 /**
- * created by yf on 2019/1/7.
+ * author : yangfang
+ * time   : 2019/1/17
+ * desc   : 推流基本参数
+ * version: 1.0
  */
 class BaseStreamConfig {
     var mUrl: String? = null
     //摄像头设置
     var mCameraFacing: Int = CameraCapture.FACING_BACK
     //帧率
-    var mFrameRate: Float = 25f
+    var mFrameRate: Float = 20F
     //码率
     var mVideoKBitrate: Int = 800
     //音频

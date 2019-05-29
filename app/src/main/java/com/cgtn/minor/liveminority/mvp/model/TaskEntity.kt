@@ -1,4 +1,4 @@
-package com.cgtn.minor.liveminority.mvp.model
+package com.cgtn.minor.liveminority.mvp.data
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
